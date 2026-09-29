@@ -138,9 +138,9 @@ export default {
 
 
                     if (
-                        redirect.origin
+                       redirect.hostname
                         ===
-                        origin.origin
+                        origin.hostname
                     ) {
 
                         redirect.protocol =

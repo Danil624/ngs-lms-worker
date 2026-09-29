@@ -9,12 +9,21 @@ use App\Models\ActivityLog;
 
 class MyCourseController extends Controller
 {
-    private function currentUser()
-    {
-        // Пока используем тестового Ивана.
-        // Потом здесь будет текущий пользователь Bitrix24.
-        return User::where('email', 'ivan@test.local')->firstOrFail();
+    
+     private function currentUser()
+{
+    if (session('lms_user_id')) {
+        return User::findOrFail(
+            session('lms_user_id')
+        );
     }
+
+    return User::where(
+        'email',
+        'ivan@test.local'
+    )->firstOrFail();
+}
+    
 
     public function index()
     {

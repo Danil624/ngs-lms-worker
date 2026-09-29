@@ -12,6 +12,11 @@ class EmployeeTestController extends Controller
 {
     private function currentUser()
     {
+         if (session('lms_user_id')) {
+        return User::findOrFail(
+            session('lms_user_id')
+        );
+    }
         return User::where(
             'email',
             'ivan@test.local'

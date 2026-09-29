@@ -11,6 +11,7 @@ use App\Http\Controllers\EmployeeLessonController;
 use App\Http\Controllers\EmployeeTestController;
 use App\Http\Controllers\HrResultsController;
 use App\Http\Controllers\HrEmployeeController;
+use App\Http\Controllers\BitrixController;
 
 Route::get('/hr/results', [HrResultsController::class, 'index'])
     ->name('hr.results');
@@ -51,3 +52,8 @@ Route::post(
 )->name('my.test.submit');
 Route::get('/hr/employees/{user}', [HrEmployeeController::class, 'show'])
     ->name('hr.employee.show');
+    Route::match(
+    ['get', 'post'],
+    '/bitrix',
+    [BitrixController::class, 'entry']
+)->name('bitrix.entry');
