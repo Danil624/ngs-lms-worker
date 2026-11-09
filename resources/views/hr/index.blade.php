@@ -51,6 +51,50 @@
 <div class="container">
 
     <h1>HR-панель</h1>
+    @if(session('success'))
+    <div style="
+        background:#e8f7e8;
+        padding:15px;
+        border-radius:8px;
+        margin-bottom:20px;
+        color:green;
+    ">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div style="
+        background:#ffeaea;
+        padding:15px;
+        border-radius:8px;
+        margin-bottom:20px;
+        color:#c00;
+    ">
+        {{ session('error') }}
+    </div>
+@endif
+
+<div class="card">
+
+    <h2>Сотрудники Bitrix24</h2>
+
+    <p>
+        Загрузить и обновить сотрудников из Bitrix24.
+    </p>
+
+    <form
+        method="POST"
+        action="{{ route('bitrix.users.sync', [], false) }}"
+     >
+        @csrf
+
+        <button type="submit">
+            Синхронизировать сотрудников
+        </button>
+    </form>
+
+</div>
 <a href="{{ route('hr.results') }}"
    style="
        display:inline-block;

@@ -1,47 +1,249 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# AGENTS.md
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+## Проект
 
-## Prerequisites
+Корпоративная LMS на Laravel с интеграцией Bitrix24.
 
-Verify that PHP and Composer are available:
+Репозиторий:
+`Danil624/ngs-lms-worker`
+
+Основная цель:
+развивать LMS как универсальный коммерческий продукт, который можно внедрять разным компаниям без передачи исходного кода.
+
+---
+
+## Критические правила Git
+
+- НИКОГДА не выполнять `git commit`, `git push`, `git merge`, `git rebase` и не создавать Pull Request без явного разрешения пользователя.
+- Перед любыми изменениями сначала изучить существующую реализацию.
+- Не удалять рабочий функционал без необходимости.
+- Не добавлять `.env`, токены, webhook URL, секреты и ключи API в Git.
+- Сообщения коммитов писать на русском языке.
+- Перед отправкой изменений показывать пользователю список изменённых файлов и кратко описывать сделанные изменения.
+
+---
+
+## Технологии проекта
+
+- PHP: `^8.3`
+- Laravel: `^13.17`
+- MySQL
+- Blade
+- Bitrix24 REST API
+- Composer
+- Laravel Pint
+- PHPUnit
+
+Текущее локальное окружение разработчика:
+- Windows
+- Laragon
+- проект: `C:\laragon\www\ngs-lms`
+- PHP: `C:\laragon\bin\php\php-8.3.33-Win32-vs16-x64`
+
+Локальные Windows-пути относятся только к окружению разработчика.
+Не хардкодить их в код приложения.
+
+---
+
+## Настройка Codex Cloud
+
+Перед работой проверить окружение:
 
 ```sh
 php -v
 composer -V
 ```
 
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
+Проект требует PHP 8.3 или совместимую версию согласно `composer.json`.
 
-macOS:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
-
-Windows PowerShell:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
-
-Linux:
+Установить зависимости без изменения их версий:
 
 ```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
+composer install
 ```
 
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
+Если для задачи нужен frontend:
 
 ```sh
-composer require laravel/boost --dev
-php artisan boost:install
+npm install
+npm run build
 ```
 
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+Не выполнять `composer require`, `composer update` или установку новых пакетов без необходимости и явного обоснования.
+
+Не использовать реальные production-секреты в Codex Cloud.
+
+Если для тестов нужен `.env`, использовать тестовые/временные значения и не коммитить файл.
+
+---
+
+## Laravel
+
+Перед изменениями:
+
+1. изучить существующие маршруты;
+2. изучить контроллеры и модели, связанные с задачей;
+3. проверить миграции;
+4. не менять архитектуру без необходимости.
+
+После изменений по возможности выполнять:
+
+```sh
+php artisan route:list
+php artisan test
+```
+
+Для изменённых PHP-файлов проверять синтаксис:
+
+```sh
+php -l path/to/file.php
+```
+
+Форматирование PHP:
+
+```sh
+./vendor/bin/pint
+```
+
+Не выполнять массовое форматирование всего проекта без необходимости, чтобы не создавать большой нерелевантный diff.
+
+Изменения структуры БД делать только через Laravel migrations.
+
+---
+
+## Документация проекта
+
+Перед началом любой существенной задачи прочитать:
+
+- `docs/PROJECT_CONTEXT.md`
+- `docs/STAGE_1_TZ.md`
+- `docs/PRODUCT_ARCHITECTURE.md`
+
+Если документация расходится с фактическим кодом, сначала указать расхождение пользователю.
+Не считать документацию доказательством того, что функция уже реализована — проверять код.
+
+---
+
+## Текущая архитектура и правила разработки
+
+### LMS Core
+
+Ядро LMS должно оставаться универсальным.
+
+К универсальному функционалу относятся:
+
+- курсы;
+- уроки;
+- треки;
+- назначения;
+- тестирование;
+- попытки;
+- домашние задания;
+- сертификаты;
+- уведомления;
+- аналитика;
+- роли;
+- AI-инструменты.
+
+Не хардкодить в ядре:
+
+- домен конкретного Bitrix24;
+- название конкретной компании;
+- ID сотрудников;
+- ID подразделений;
+- клиентские webhook URL;
+- клиентские секреты.
+
+### Bitrix24
+
+Bitrix24 должен постепенно становиться отдельным интеграционным слоем.
+
+Интеграция отвечает за:
+
+- авторизацию;
+- REST API;
+- получение текущего пользователя;
+- синхронизацию сотрудников;
+- подразделения;
+- преобразование данных Bitrix24 во внутренние модели LMS.
+
+Не ломать существующую рабочую интеграцию при рефакторинге.
+
+### Клиентские настройки
+
+Специфичные для конкретной организации настройки и бизнес-правила должны отделяться от универсального ядра.
+
+---
+
+## Важные особенности существующей реализации
+
+Приложение работает внутри Bitrix24 iframe.
+
+В существующем коде используются относительные маршруты вида:
+
+```php
+route('route.name', $parameters, false)
+```
+
+Это было сделано для предотвращения проблем с 403/419 и потерей сессии внутри iframe.
+
+Не заменять такие маршруты обратно на абсолютные без проверки причины и тестирования.
+
+Сессии Bitrix24/iframe требуют особого внимания к:
+
+- `SameSite`
+- secure cookies
+- partitioned cookies
+- proxy/HTTPS headers
+
+Не хардкодить текущие Cloudflare/Tailscale URL как часть продуктовой архитектуры.
+
+---
+
+## Первый этап ТЗ
+
+Мобильная разработка и отдельное мобильное приложение НЕ входят в первый этап.
+
+Точный состав первого этапа описан в:
+
+`docs/STAGE_1_TZ.md`
+
+Не расширять объём первого этапа без явного запроса пользователя.
+
+---
+
+## Работа с существующим кодом
+
+Перед правкой:
+
+1. найти существующую реализацию;
+2. понять текущий сценарий;
+3. определить минимальный набор изменений;
+4. сохранить обратную совместимость;
+5. проверить связанные маршруты, Blade-шаблоны и модели.
+
+Предпочитать небольшие понятные изменения вместо полного переписывания рабочего функционала.
+
+---
+
+## Безопасность
+
+- Не логировать AUTH_ID, access token, refresh token и webhook-секреты.
+- Не добавлять секреты в репозиторий.
+- Проверять доступ пользователя к курсам/назначениям на серверной стороне.
+- Не полагаться только на скрытие кнопок в Blade для контроля прав.
+- При добавлении загрузки файлов проверять MIME, расширение и лимиты размера.
+
+---
+
+## Перед завершением задачи
+
+Сообщить пользователю:
+
+1. какие файлы изменены;
+2. что именно реализовано;
+3. какие проверки выполнены;
+4. что не удалось проверить;
+5. требуется ли миграция/настройка окружения.
+
+Не выполнять commit/push без отдельного разрешения пользователя.

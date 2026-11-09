@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <title>Мои курсы</title>
@@ -53,41 +54,76 @@
 
     <h1>Мои курсы</h1>
 
-    <p>Здравствуйте, {{ $user->name }}</p>
+    <p>
+        Здравствуйте, {{ $user->name }}
+    </p>
+
+    @if(in_array($user->role, ['hr', 'admin']))
+
+        <a
+            href="/hr"
+            target="_self"
+            class="btn"
+            style="margin-bottom:20px;"
+        >
+            HR-панель
+        </a>
+
+    @endif
+
 
     @forelse($assignments as $assignment)
 
         <div class="card">
 
-            <h2>{{ $assignment->course->title }}</h2>
+            <h2>
+                {{ $assignment->course->title }}
+            </h2>
 
-            <p>{{ $assignment->course->description }}</p>
+            <p>
+                {{ $assignment->course->description }}
+            </p>
 
-            <p>Прогресс: {{ $assignment->progress }}%</p>
+            <p>
+                Прогресс:
+                {{ $assignment->progress }}%
+            </p>
 
             <div class="progress">
+
                 <div
                     class="progress-bar"
-                    style="width: {{ $assignment->progress }}%">
+                    style="width: {{ $assignment->progress }}%"
+                >
                 </div>
+
             </div>
 
             <p>
                 Дедлайн:
+
                 {{ $assignment->deadline
-                    ? \Carbon\Carbon::parse($assignment->deadline)->format('d.m.Y')
+                    ? \Carbon\Carbon::parse(
+                        $assignment->deadline
+                    )->format('d.m.Y')
                     : 'не указан'
                 }}
             </p>
 
             <a
-                href="{{ route('my.courses.show', $assignment) }}"
+                href="{{ route(
+                    'my.courses.show',
+                    $assignment,
+                    false
+                ) }}"
                 class="btn"
             >
+
                 {{ $assignment->progress > 0
                     ? 'Продолжить курс'
                     : 'Начать курс'
                 }}
+
             </a>
 
         </div>
@@ -103,4 +139,5 @@
 </div>
 
 </body>
+
 </html>

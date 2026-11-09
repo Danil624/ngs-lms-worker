@@ -58,7 +58,8 @@
 
     <a href="{{ route(
         'my.courses.show',
-        $assignment
+        $assignment,
+         false
     ) }}">
 
         ← Назад к курсу
@@ -92,102 +93,3 @@
                 <p>
                     Видео:
                 </p>
-
-                <a
-                    href="{{ $lesson->content }}"
-                    target="_blank"
-                >
-                    Открыть видео
-                </a>
-
-
-            @elseif($lesson->type === 'pdf')
-
-                <p>
-                    PDF-документ:
-                </p>
-
-                <a
-                    href="{{ $lesson->content }}"
-                    target="_blank"
-                >
-                    Открыть PDF
-                </a>
-
-
-            @elseif($lesson->type === 'audio')
-
-                <p>
-                    Аудиоматериал:
-                </p>
-
-                <a
-                    href="{{ $lesson->content }}"
-                    target="_blank"
-                >
-                    Открыть аудио
-                </a>
-
-
-            @elseif($lesson->type === 'file')
-
-                <a
-                    href="{{ $lesson->content }}"
-                    target="_blank"
-                >
-                    Скачать файл
-                </a>
-
-
-            @else
-
-                {{ $lesson->content }}
-
-            @endif
-
-        </div>
-
-
-        @if($progress->status === 'completed')
-
-            <p class="completed">
-
-                ✅ Материал изучен
-
-            </p>
-
-        @else
-
-            <form
-                method="POST"
-                action="{{ route(
-                    'my.lessons.complete',
-                    [
-                        $assignment,
-                        $lesson
-                    ]
-                ) }}"
-            >
-
-                @csrf
-
-                <button
-                    class="btn"
-                    type="submit"
-                >
-
-                    ✓ Материал изучен
-
-                </button>
-
-            </form>
-
-        @endif
-
-    </div>
-
-</div>
-
-</body>
-
-</html>

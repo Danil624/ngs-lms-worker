@@ -12,19 +12,21 @@ class EmployeeTestController extends Controller
 {
     private function currentUser()
     {
-         if (session('lms_user_id')) {
-        return User::findOrFail(
-            session('lms_user_id')
-        );
-    }
+        if (session('lms_user_id')) {
+            return User::findOrFail(
+                session('lms_user_id')
+            );
+        }
+
         return User::where(
             'email',
             'ivan@test.local'
         )->firstOrFail();
     }
 
-    public function show(CourseAssignment $assignment)
-    {
+    public function show(
+        CourseAssignment $assignment
+    ) {
         $user = $this->currentUser();
 
         abort_unless(
@@ -44,12 +46,24 @@ class EmployeeTestController extends Controller
                 'test_id',
                 $test->id
             )
-            ->where('user_id', $user->id)
+            ->where(
+                'user_id',
+                $user->id
+            )
             ->count();
 
-        if ($attemptsCount >= $test->max_attempts) {
+        if (
+            $attemptsCount
+            >= $test->max_attempts
+        ) {
             return redirect()
-                ->route('my.courses.show', $assignment)
+                ->to(
+                    route(
+                        'my.courses.show',
+                        $assignment,
+                        false
+                    )
+                )
                 ->with(
                     'error',
                     'Попытки закончились'
@@ -58,7 +72,8 @@ class EmployeeTestController extends Controller
 
         ActivityLog::create([
             'user_id' => $user->id,
-            'course_id' => $assignment->course_id,
+            'course_id' =>
+                $assignment->course_id,
             'lesson_id' => null,
             'event' => 'TEST_STARTED',
             'data' => [
@@ -99,12 +114,24 @@ class EmployeeTestController extends Controller
                 'test_id',
                 $test->id
             )
-            ->where('user_id', $user->id)
+            ->where(
+                'user_id',
+                $user->id
+            )
             ->count();
 
-        if ($attemptsCount >= $test->max_attempts) {
+        if (
+            $attemptsCount
+            >= $test->max_attempts
+        ) {
             return redirect()
-                ->route('my.courses.show', $assignment)
+                ->to(
+                    route(
+                        'my.courses.show',
+                        $assignment,
+                        false
+                    )
+                )
                 ->with(
                     'error',
                     'Попытки закончились'
@@ -115,96 +142,165 @@ class EmployeeTestController extends Controller
 
         $correct = 0;
 
-        foreach ($questions as $question) {
+        foreach (
+            $questions
+            as $question
+        ) {
 
             $selectedAnswerId =
                 $request->input(
-                    'answers.' . $question->id
+                    'answers.' .
+                    $question->id
                 );
 
             $correctAnswer =
-                $question->answers
+                $question
+                    ->answers
                     ->firstWhere(
                         'is_correct',
                         true
                     );
 
             if (
-                $correctAnswer &&
-                (int)$selectedAnswerId
-                    === (int)$correctAnswer->id
+                $correctAnswer
+                &&
+                (int) $selectedAnswerId
+                ===
+                (int) $correctAnswer->id
             ) {
                 $correct++;
             }
         }
 
-        $total = $questions->count();
+        $total =
+            $questions->count();
 
-        $percent = $total > 0
-            ? round(($correct / $total) * 100)
+        $percent =
+            $total > 0
+            ? round(
+                ($correct / $total)
+                * 100
+            )
             : 0;
 
         $passed =
-            $percent >= $test->passing_score;
+            $percent
+            >= $test->passing_score;
 
-        $attempt = TestAttempt::create([
-            'test_id' => $test->id,
-            'user_id' => $user->id,
-            'attempt_number' =>
-                $attemptsCount + 1,
-            'score' => $correct,
-            'percent' => $percent,
-            'passed' => $passed,
-            'started_at' => now(),
-            'finished_at' => now(),
-        ]);
+        $attempt =
+            TestAttempt::create([
+                'test_id' =>
+                    $test->id,
+
+                'user_id' =>
+                    $user->id,
+
+                'attempt_number' =>
+                    $attemptsCount + 1,
+
+                'score' =>
+                    $correct,
+
+                'percent' =>
+                    $percent,
+
+                'passed' =>
+                    $passed,
+
+                'started_at' =>
+                    now(),
+
+                'finished_at' =>
+                    now(),
+            ]);
 
         ActivityLog::create([
-            'user_id' => $user->id,
-            'course_id' => $assignment->course_id,
-            'lesson_id' => null,
-            'event' => 'TEST_FINISHED',
+            'user_id' =>
+                $user->id,
+
+            'course_id' =>
+                $assignment->course_id,
+
+            'lesson_id' =>
+                null,
+
+            'event' =>
+                'TEST_FINISHED',
+
             'data' => [
-                'test_id' => $test->id,
+                'test_id' =>
+                    $test->id,
+
                 'attempt' =>
-                    $attempt->attempt_number,
-                'percent' => $percent,
-                'passed' => $passed,
+                    $attempt
+                        ->attempt_number,
+
+                'percent' =>
+                    $percent,
+
+                'passed' =>
+                    $passed,
             ],
         ]);
 
         if ($passed) {
 
             $assignment->update([
-                'status' => 'completed',
-                'progress' => 100,
-                'completed_at' => now(),
+                'status' =>
+                    'completed',
+
+                'progress' =>
+                    100,
+
+                'completed_at' =>
+                    now(),
             ]);
 
             ActivityLog::create([
-                'user_id' => $user->id,
+                'user_id' =>
+                    $user->id,
+
                 'course_id' =>
-                    $assignment->course_id,
-                'lesson_id' => null,
-                'event' => 'COURSE_COMPLETED',
-                'data' => null,
+                    $assignment
+                        ->course_id,
+
+                'lesson_id' =>
+                    null,
+
+                'event' =>
+                    'COURSE_COMPLETED',
+
+                'data' =>
+                    null,
             ]);
         }
 
         return redirect()
-            ->route(
-                'my.courses.show',
-                $assignment
+            ->to(
+                route(
+                    'my.courses.show',
+                    $assignment,
+                    false
+                )
             )
             ->with(
                 'test_result',
                 [
-                    'correct' => $correct,
-                    'total' => $total,
-                    'percent' => $percent,
-                    'passed' => $passed,
+                    'correct' =>
+                        $correct,
+
+                    'total' =>
+                        $total,
+
+                    'percent' =>
+                        $percent,
+
+                    'passed' =>
+                        $passed,
+
                     'attempt' =>
-                        $attempt->attempt_number,
+                        $attempt
+                            ->attempt_number,
                 ]
             );
     }

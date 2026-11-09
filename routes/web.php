@@ -57,3 +57,7 @@ Route::get('/hr/employees/{user}', [HrEmployeeController::class, 'show'])
     '/bitrix',
     [BitrixController::class, 'entry']
 )->name('bitrix.entry');
+Route::post(
+    '/bitrix/sync-users',
+    [BitrixController::class, 'syncUsers']
+)->name('bitrix.users.sync');

@@ -1,35 +1,3 @@
-<?php
-
-
-namespace App\Http\Controllers;
-
-use App\Models\User;
-use App\Models\Lesson;
-use App\Models\LessonProgress;
-use App\Models\CourseAssignment;
-use App\Models\ActivityLog;
-
-class EmployeeLessonController extends Controller
-{
-    private function currentUser()
-    {
-    if (session('lms_user_id')) {
-        return User::findOrFail(
-            session('lms_user_id')
-        );
-    }    
-    return User::where(
-            'email',
-            'ivan@test.local'
-        )->firstOrFail();
-    }
-
-    public function show(
-        CourseAssignment $assignment,
-        Lesson $lesson
-    ) {
-        $user = $this->currentUser();
-
         abort_unless(
             $assignment->user_id === $user->id,
             403
@@ -140,8 +108,18 @@ class EmployeeLessonController extends Controller
         ]);
 
         return redirect()
-            ->route('my.courses.show', $assignment)
-            ->with('success', 'Урок завершён');
-    }
+    ->to(
+        route(
+            'my.courses.show',
+            $assignment,
+            false
+        )
+    )
+    ->with(
+        'success',
+        'Урок завершён'
+    );
+
+            }
 }
 

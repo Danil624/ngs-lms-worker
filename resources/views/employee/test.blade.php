@@ -2,13 +2,11 @@
 <html lang="ru">
 
 <head>
-
     <meta charset="UTF-8">
 
     <title>{{ $test->title }}</title>
 
     <style>
-
         body {
             font-family: Arial;
             background: #f4f6f9;
@@ -44,9 +42,7 @@
             border-radius: 7px;
             cursor: pointer;
         }
-
     </style>
-
 </head>
 
 <body>
@@ -55,7 +51,8 @@
 
     <a href="{{ route(
         'my.courses.show',
-        $assignment
+        $assignment,
+        false
     ) }}">
         ← Назад к курсу
     </a>
@@ -83,7 +80,8 @@
         method="POST"
         action="{{ route(
             'my.test.submit',
-            $assignment
+            $assignment,
+            false
         ) }}"
     >
 
@@ -138,5 +136,4 @@
 </div>
 
 </body>
-
 </html>

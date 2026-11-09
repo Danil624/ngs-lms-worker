@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>{{ $assignment->course->title }}</title>
+
+    <title>
+        {{ $assignment->course->title }}
+    </title>
 
     <style>
+
         body {
             font-family: Arial;
             background: #f4f6f9;
@@ -53,99 +59,140 @@
             background: #1677ff;
             height: 100%;
         }
+
     </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <a href="{{ route('my.courses') }}">
+    <a
+        href="{{ route(
+            'my.courses',
+            [],
+            false
+        ) }}"
+    >
         ← Мои курсы
     </a>
 
-    <h1>{{ $assignment->course->title }}</h1>
 
-    <p>{{ $assignment->course->description }}</p>
-    
-@if(session('test_result'))
+    <h1>
+        {{ $assignment->course->title }}
+    </h1>
 
-    @php
-        $result = session('test_result');
-    @endphp
+    <p>
+        {{ $assignment->course->description }}
+    </p>
+
+
+    @if(session('test_result'))
+
+        @php
+            $result = session('test_result');
+        @endphp
+
+        <div class="card">
+
+            <h2>
+                Результат теста
+            </h2>
+
+            <p>
+                Правильных ответов:
+                {{ $result['correct'] }}
+                из
+                {{ $result['total'] }}
+            </p>
+
+            <p>
+                Результат:
+                {{ $result['percent'] }}%
+            </p>
+
+            <p>
+                Попытка:
+                {{ $result['attempt'] }}
+            </p>
+
+            @if($result['passed'])
+
+                <strong class="completed">
+                    ✅ ТЕСТ СДАН
+                </strong>
+
+            @else
+
+                <strong style="color:red;">
+                    ❌ ТЕСТ НЕ СДАН
+                </strong>
+
+            @endif
+
+        </div>
+
+    @endif
+
 
     <div class="card">
 
-        <h2>Результат теста</h2>
+        <h2>
+            Прогресс
+        </h2>
 
         <p>
-            Правильных ответов:
-            {{ $result['correct'] }}
-            из
-            {{ $result['total'] }}
+            {{ $assignment->progress }}%
         </p>
-
-        <p>
-            Результат:
-            {{ $result['percent'] }}%
-        </p>
-
-        <p>
-            Попытка:
-            {{ $result['attempt'] }}
-        </p>
-
-        @if($result['passed'])
-
-            <strong class="completed">
-                ✅ ТЕСТ СДАН
-            </strong>
-
-        @else
-
-            <strong style="color:red;">
-                ❌ ТЕСТ НЕ СДАН
-            </strong>
-
-        @endif
-
-    </div>
-
-@endif
-    <div class="card">
-
-        <h2>Прогресс</h2>
-
-        <p>{{ $assignment->progress }}%</p>
 
         <div class="progress">
+
             <div
                 class="progress-bar"
-                style="width: {{ $assignment->progress }}%">
+                style="width: {{ $assignment->progress }}%"
+            >
             </div>
+
         </div>
 
     </div>
 
+
     <div class="card">
 
-        <h2>Уроки</h2>
+        <h2>
+            Уроки
+        </h2>
 
-        @forelse($assignment->course->lessons as $lesson)
+        @forelse(
+            $assignment->course->lessons
+            as $lesson
+        )
 
             @php
-                $progress = $lessonProgress[$lesson->id] ?? null;
+
+                $progress =
+                    $lessonProgress[$lesson->id]
+                    ?? null;
+
             @endphp
 
             <div class="lesson">
 
                 <strong>
-                    {{ $loop->iteration }}. {{ $lesson->title }}
+
+                    {{ $loop->iteration }}.
+                    {{ $lesson->title }}
+
                 </strong>
 
                 <br>
 
-                @if($progress && $progress->status === 'completed')
+                @if(
+                    $progress
+                    && $progress->status === 'completed'
+                )
 
                     <span class="completed">
                         ✅ Пройден
@@ -165,15 +212,31 @@
 
                 <a
                     class="btn"
-                    href="{{ route('my.lessons.show', [$assignment, $lesson]) }}"
+                    href="{{ route(
+                        'my.lessons.show',
+                        [
+                            $assignment,
+                            $lesson
+                        ],
+                        false
+                    ) }}"
                 >
 
-                    @if($progress && $progress->status === 'completed')
+                    @if(
+                        $progress
+                        && $progress->status === 'completed'
+                    )
+
                         Посмотреть
+
                     @elseif($progress)
+
                         Продолжить
+
                     @else
+
                         Начать
+
                     @endif
 
                 </a>
@@ -182,57 +245,85 @@
 
         @empty
 
-            <p>Уроков пока нет.</p>
+            <p>
+                Уроков пока нет.
+            </p>
 
         @endforelse
 
     </div>
-@if($assignment->course->test)
 
-    <div class="card">
 
-        <h2>Итоговый тест</h2>
+    @if($assignment->course->test)
 
-        <p>
-            {{ $assignment->course->test->title }}
-        </p>
+        <div class="card">
 
-        <p>
-            Вопросов:
-            {{ $assignment->course->test->questions->count() }}
-        </p>
+            <h2>
+                Итоговый тест
+            </h2>
 
-        <p>
-            Проходной балл:
-            {{ $assignment->course->test->passing_score }}%
-        </p>
+            <p>
+                {{ $assignment->course->test->title }}
+            </p>
 
-        <p>
-            Попыток:
-            {{ $assignment->course->test->max_attempts }}
-        </p>
+            <p>
+                Вопросов:
+                {{ $assignment
+                    ->course
+                    ->test
+                    ->questions
+                    ->count()
+                }}
+            </p>
 
-        @if($assignment->status === 'completed')
+            <p>
+                Проходной балл:
+                {{ $assignment
+                    ->course
+                    ->test
+                    ->passing_score
+                }}%
+            </p>
 
-            <span class="completed">
-                ✅ Тест сдан
-            </span>
+            <p>
+                Попыток:
+                {{ $assignment
+                    ->course
+                    ->test
+                    ->max_attempts
+                }}
+            </p>
 
-        @else
+            @if(
+                $assignment->status
+                === 'completed'
+            )
 
-            <a
-                href="{{ route('my.test.show', $assignment) }}"
-                class="btn"
-            >
-                Пройти тест
-            </a>
+                <span class="completed">
+                    ✅ Тест сдан
+                </span>
 
-        @endif
+            @else
 
-    </div>
+                <a
+                    href="{{ route(
+                        'my.test.show',
+                        $assignment,
+                        false
+                    ) }}"
+                    class="btn"
+                >
+                    Пройти тест
+                </a>
 
-@endif
+            @endif
+
+        </div>
+
+    @endif
+
 </div>
 
 </body>
+
 </html>
